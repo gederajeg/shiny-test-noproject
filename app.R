@@ -14,14 +14,24 @@ ui <- fluidPage( # a layout function: it sets up the basic visual structure of t
 
 server <- function(input, output, session) {
   
+  # Create a reactive expression ({...}) to retrieve the dataset once
+  dataset <- reactive(
+    
+    {
+      # the input$dataset is populated with the current value of the UI component with ID (i.e., inputId) "dataset"
+      get(input$dataset, "package:datasets")
+      
+    }
+    
+  )
+  
   # prepare the "how" to Shiny to generate the output
   # the output$summary is referenced with the UI (outputId = "summary") above
   output$summary <- renderPrint( # a render{Type} function paired with verbatimTextOutput(), a {type}Output function
     
     {
       # In this R expression ({...}), we tell shiny to store the output of summary() on the "dataset" into the output$summary
-      dataset <- get(input$dataset, "package:datasets")
-      summary(dataset)
+      summary(dataset())
     }
     
   )
@@ -29,15 +39,13 @@ server <- function(input, output, session) {
   output$table <- renderTable(
     
     {
-      # the input$dataset is populated with the current value of the UI component with ID (i.e., inputId) "dataset"
-      dataset <- get(input$dataset, "package:datasets")
-      dataset
+      
+      dataset()
       
     }
     
   )
   
-
 }
 
 shinyApp(ui, server)
